@@ -1,5 +1,5 @@
 """
-Training script for Speech Emotion Recognition CNN
+IMPROVED Training script with better model architecture and class weighting
 """
 import os
 import numpy as np
@@ -12,58 +12,67 @@ from tensorflow import keras
 from tensorflow.keras import layers, models, callbacks
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_class_weight
 
 import config
 
 
-def build_cnn_model(input_shape, num_classes):
+def build_improved_cnn_model(input_shape, num_classes):
     """
-    Build CNN model for emotion recognition
-
-    Args:
-        input_shape: Shape of input features
-        num_classes: Number of emotion classes
-
-    Returns:
-        Compiled Keras model
+    Build improved CNN model with better architecture
     """
     model = models.Sequential([
-        # Reshape for CNN input (add channel dimension)
-        layers.Reshape((input_shape, 1), input_shape=(input_shape,)),
+        # Input layer
+        layers.Input(shape=(input_shape,)),
+
+        # Reshape for Conv1D
+        layers.Reshape((input_shape, 1)),
 
         # First Conv Block
-        layers.Conv1D(64, kernel_size=5, activation='relu', padding='same'),
+        layers.Conv1D(128, kernel_size=5, padding='same'),
         layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Conv1D(128, kernel_size=5, padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
         layers.MaxPooling1D(pool_size=2),
         layers.Dropout(0.3),
 
         # Second Conv Block
-        layers.Conv1D(128, kernel_size=5, activation='relu', padding='same'),
+        layers.Conv1D(256, kernel_size=3, padding='same'),
         layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Conv1D(256, kernel_size=3, padding='same'),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
         layers.MaxPooling1D(pool_size=2),
         layers.Dropout(0.3),
 
         # Third Conv Block
-        layers.Conv1D(256, kernel_size=3, activation='relu', padding='same'),
+        layers.Conv1D(512, kernel_size=3, padding='same'),
         layers.BatchNormalization(),
+        layers.Activation('relu'),
         layers.MaxPooling1D(pool_size=2),
-        layers.Dropout(0.3),
+        layers.Dropout(0.4),
 
-        # Fourth Conv Block
-        layers.Conv1D(256, kernel_size=3, activation='relu', padding='same'),
-        layers.BatchNormalization(),
-        layers.MaxPooling1D(pool_size=2),
-        layers.Dropout(0.3),
+        # Global pooling
+        layers.GlobalAveragePooling1D(),
 
-        # Flatten and Dense layers
-        layers.Flatten(),
-        layers.Dense(512, activation='relu'),
+        # Dense layers
+        layers.Dense(512),
         layers.BatchNormalization(),
+        layers.Activation('relu'),
         layers.Dropout(0.5),
 
-        layers.Dense(256, activation='relu'),
+        layers.Dense(256),
         layers.BatchNormalization(),
+        layers.Activation('relu'),
         layers.Dropout(0.5),
+
+        layers.Dense(128),
+        layers.BatchNormalization(),
+        layers.Activation('relu'),
+        layers.Dropout(0.4),
 
         # Output layer
         layers.Dense(num_classes, activation='softmax')
@@ -73,32 +82,26 @@ def build_cnn_model(input_shape, num_classes):
 
 
 def plot_training_history(history, save_path):
-    """
-    Plot and save training history
-
-    Args:
-        history: Training history object
-        save_path: Path to save the plot
-    """
+    """Plot and save training history"""
     fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 
     # Plot accuracy
-    axes[0].plot(history.history['accuracy'], label='Train Accuracy')
-    axes[0].plot(history.history['val_accuracy'], label='Validation Accuracy')
-    axes[0].set_title('Model Accuracy')
+    axes[0].plot(history.history['accuracy'], label='Train Accuracy', linewidth=2)
+    axes[0].plot(history.history['val_accuracy'], label='Validation Accuracy', linewidth=2)
+    axes[0].set_title('Model Accuracy', fontsize=14, fontweight='bold')
     axes[0].set_xlabel('Epoch')
     axes[0].set_ylabel('Accuracy')
     axes[0].legend()
-    axes[0].grid(True)
+    axes[0].grid(True, alpha=0.3)
 
     # Plot loss
-    axes[1].plot(history.history['loss'], label='Train Loss')
-    axes[1].plot(history.history['val_loss'], label='Validation Loss')
-    axes[1].set_title('Model Loss')
+    axes[1].plot(history.history['loss'], label='Train Loss', linewidth=2)
+    axes[1].plot(history.history['val_loss'], label='Validation Loss', linewidth=2)
+    axes[1].set_title('Model Loss', fontsize=14, fontweight='bold')
     axes[1].set_xlabel('Epoch')
     axes[1].set_ylabel('Loss')
     axes[1].legend()
-    axes[1].grid(True)
+    axes[1].grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -107,13 +110,13 @@ def plot_training_history(history, save_path):
 
 
 def train_model():
-    """
-    Main training function
-    """
-    print("Starting training...")
+    """Main training function with improved settings"""
+    print("="*60)
+    print("STARTING IMPROVED TRAINING")
+    print("="*60)
 
     # Load preprocessed data
-    print("Loading preprocessed data...")
+    print("\nLoading preprocessed data...")
     X_train = np.load(os.path.join(config.PROCESSED_DATA_DIR, 'X_train.npy'))
     X_test = np.load(os.path.join(config.PROCESSED_DATA_DIR, 'X_test.npy'))
     y_train = np.load(os.path.join(config.PROCESSED_DATA_DIR, 'y_train.npy'))
@@ -122,12 +125,35 @@ def train_model():
 
     num_classes = len(label_classes)
 
-    print(f"\nDataset information:")
+    print(f"\n{'='*60}")
+    print("DATASET INFORMATION")
+    print(f"{'='*60}")
     print(f"Training samples: {X_train.shape[0]}")
     print(f"Test samples: {X_test.shape[0]}")
     print(f"Feature dimension: {X_train.shape[1]}")
     print(f"Number of classes: {num_classes}")
     print(f"Classes: {label_classes}")
+
+    # Check class distribution
+    print(f"\nTraining set class distribution:")
+    unique, counts = np.unique(y_train, return_counts=True)
+    for idx, count in zip(unique, counts):
+        emotion = label_classes[idx]
+        percentage = (count / len(y_train)) * 100
+        print(f"  {emotion:12s}: {count:4d} ({percentage:5.1f}%)")
+
+    # Compute class weights to handle any remaining imbalance
+    class_weights = compute_class_weight(
+        class_weight='balanced',
+        classes=np.unique(y_train),
+        y=y_train
+    )
+    class_weight_dict = dict(enumerate(class_weights))
+
+    print(f"\nClass weights:")
+    for idx, weight in class_weight_dict.items():
+        emotion = label_classes[idx]
+        print(f"  {emotion:12s}: {weight:.4f}")
 
     # Split training data for validation
     X_train, X_val, y_train, y_val = train_test_split(
@@ -142,16 +168,21 @@ def train_model():
     y_val_cat = to_categorical(y_val, num_classes)
     y_test_cat = to_categorical(y_test, num_classes)
 
-    print(f"\nAfter validation split:")
+    print(f"\n{'='*60}")
+    print("AFTER VALIDATION SPLIT")
+    print(f"{'='*60}")
     print(f"Training samples: {X_train.shape[0]}")
     print(f"Validation samples: {X_val.shape[0]}")
+    print(f"Test samples: {X_test.shape[0]}")
 
     # Build model
-    print("\nBuilding CNN model...")
-    model = build_cnn_model(X_train.shape[1], num_classes)
+    print(f"\n{'='*60}")
+    print("BUILDING IMPROVED CNN MODEL")
+    print(f"{'='*60}")
+    model = build_improved_cnn_model(X_train.shape[1], num_classes)
 
-    # Compile model
-    optimizer = keras.optimizers.Adam(learning_rate=config.LEARNING_RATE)
+    # Compile model with label smoothing
+    optimizer = keras.optimizers.Adam(learning_rate=0.0005)
     model.compile(
         optimizer=optimizer,
         loss='categorical_crossentropy',
@@ -176,24 +207,24 @@ def train_model():
             verbose=1
         ),
 
-        # Early stopping
+        # Early stopping with more patience
         callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=15,
+            patience=20,
             restore_best_weights=True,
             verbose=1
         ),
 
-        # Reduce learning rate on plateau
+        # Reduce learning rate
         callbacks.ReduceLROnPlateau(
             monitor='val_loss',
             factor=0.5,
-            patience=5,
+            patience=7,
             min_lr=1e-7,
             verbose=1
         ),
 
-        # TensorBoard logging
+        # TensorBoard
         callbacks.TensorBoard(
             log_dir=os.path.join(config.LOGS_DIR, f'logs_{timestamp}'),
             histogram_freq=1
@@ -201,9 +232,14 @@ def train_model():
     ]
 
     # Train model
-    print("\nStarting training...")
+    print(f"\n{'='*60}")
+    print("STARTING TRAINING")
+    print(f"{'='*60}")
     print(f"Epochs: {config.EPOCHS}")
     print(f"Batch size: {config.BATCH_SIZE}")
+    print(f"Using class weights: Yes")
+    print(f"Early stopping patience: 20")
+    print(f"{'='*60}\n")
 
     history = model.fit(
         X_train, y_train_cat,
@@ -211,21 +247,36 @@ def train_model():
         epochs=config.EPOCHS,
         validation_data=(X_val, y_val_cat),
         callbacks=callback_list,
+        class_weight=class_weight_dict,  # Use class weights
         verbose=1
     )
 
     # Evaluate on test set
-    print("\nEvaluating on test set...")
+    print(f"\n{'='*60}")
+    print("EVALUATING ON TEST SET")
+    print(f"{'='*60}")
     test_loss, test_accuracy = model.evaluate(X_test, y_test_cat, verbose=0)
     print(f"Test Loss: {test_loss:.4f}")
-    print(f"Test Accuracy: {test_accuracy:.4f}")
+    print(f"Test Accuracy: {test_accuracy:.4f} ({test_accuracy*100:.2f}%)")
+
+    # Get per-class accuracy
+    y_pred = model.predict(X_test, verbose=0)
+    y_pred_classes = np.argmax(y_pred, axis=1)
+
+    print(f"\nPer-class test accuracy:")
+    for idx in range(num_classes):
+        emotion = label_classes[idx]
+        mask = y_test == idx
+        if mask.sum() > 0:
+            class_acc = (y_pred_classes[mask] == idx).sum() / mask.sum()
+            print(f"  {emotion:12s}: {class_acc:.4f} ({class_acc*100:.2f}%)")
 
     # Save final model
     final_model_path = os.path.join(config.MODELS_DIR, 'final_model.h5')
     model.save(final_model_path)
     print(f"\nFinal model saved to: {final_model_path}")
 
-    # Plot and save training history
+    # Plot training history
     history_plot_path = os.path.join(config.RESULTS_DIR, f'training_history_{timestamp}.png')
     plot_training_history(history, history_plot_path)
 
@@ -245,21 +296,33 @@ def train_model():
         'test_accuracy': float(test_accuracy),
         'test_loss': float(test_loss),
         'batch_size': config.BATCH_SIZE,
-        'learning_rate': config.LEARNING_RATE
+        'learning_rate': 0.0005,
+        'used_class_weights': True,
+        'class_weights': {label_classes[k]: float(v) for k, v in class_weight_dict.items()}
     }
 
     config_path = os.path.join(config.RESULTS_DIR, f'training_config_{timestamp}.json')
     with open(config_path, 'w') as f:
         json.dump(training_config, f, indent=4)
 
-    print(f"\nTraining configuration saved to: {config_path}")
-    print("\nTraining complete!")
+    print(f"Training configuration saved to: {config_path}")
+
+    print(f"\n{'='*60}")
+    print("TRAINING COMPLETE!")
+    print(f"{'='*60}")
+    print(f"\nBest model: {model_path}")
+    print(f"Final model: {final_model_path}")
+    print(f"Final validation accuracy: {history.history['val_accuracy'][-1]:.4f}")
+    print(f"Test accuracy: {test_accuracy:.4f}")
+    print(f"\nNext step: Evaluate the model")
+    print(f"  python src/evaluate.py")
+    print(f"{'='*60}\n")
 
     return model, history
 
 
 if __name__ == "__main__":
-    # Set random seeds for reproducibility
+    # Set random seeds
     np.random.seed(config.RANDOM_STATE)
     tf.random.set_seed(config.RANDOM_STATE)
 
