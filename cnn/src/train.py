@@ -36,7 +36,7 @@ def build_spectrogram_cnn(input_shape, num_classes):
         layers.BatchNormalization(),
         layers.Activation('relu'),
         layers.MaxPooling2D((2, 2)),
-        layers.Dropout(0.25),
+        layers.Dropout(0.4),  # Increased from 0.25
 
         # Block 2
         layers.Conv2D(64, (3, 3), padding='same'),
@@ -46,7 +46,7 @@ def build_spectrogram_cnn(input_shape, num_classes):
         layers.BatchNormalization(),
         layers.Activation('relu'),
         layers.MaxPooling2D((2, 2)),
-        layers.Dropout(0.25),
+        layers.Dropout(0.4),  # Increased from 0.25
 
         # Block 3
         layers.Conv2D(128, (3, 3), padding='same'),
@@ -56,7 +56,7 @@ def build_spectrogram_cnn(input_shape, num_classes):
         layers.BatchNormalization(),
         layers.Activation('relu'),
         layers.MaxPooling2D((2, 2)),
-        layers.Dropout(0.25),
+        layers.Dropout(0.4),  # Increased from 0.25
 
         # Block 4
         layers.Conv2D(256, (3, 3), padding='same'),
@@ -66,20 +66,20 @@ def build_spectrogram_cnn(input_shape, num_classes):
         layers.BatchNormalization(),
         layers.Activation('relu'),
         layers.MaxPooling2D((2, 2)),
-        layers.Dropout(0.25),
+        layers.Dropout(0.4),  # Increased from 0.25
 
         # Global pooling and dense layers
         layers.GlobalAveragePooling2D(),
 
-        layers.Dense(512),
+        layers.Dense(256),  # Reduced from 512
         layers.BatchNormalization(),
         layers.Activation('relu'),
-        layers.Dropout(0.5),
+        layers.Dropout(0.6),  # Increased from 0.5
 
-        layers.Dense(256),
+        layers.Dense(128),  # Reduced from 256
         layers.BatchNormalization(),
         layers.Activation('relu'),
-        layers.Dropout(0.5),
+        layers.Dropout(0.6),  # Increased from 0.5
 
         # Output layer
         layers.Dense(num_classes, activation='softmax')

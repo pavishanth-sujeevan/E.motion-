@@ -26,8 +26,8 @@ MAX_TIME_STEPS = 130  # Width of spectrogram (will pad/truncate to this)
 
 # Model parameters
 BATCH_SIZE = 16  # Reduced for stability
-EPOCHS = 150
-LEARNING_RATE = 0.0001  # Lower learning rate
+EPOCHS = 50  # Increased for proper training
+LEARNING_RATE = 0.001  # Increased for better initial learning
 VALIDATION_SPLIT = 0.15
 TEST_SIZE = 0.15
 RANDOM_STATE = 42

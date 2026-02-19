@@ -1,0 +1,67 @@
+# Data files
+cnn/data/
+emotion2vec/data/
+
+# Model files
+*.h5
+*.keras
+cnn/models/
+emotion2vec/models/
+
+# Logs
+cnn/logs/
+emotion2vec/logs/
+*.log
+
+# Results
+cnn/results/
+emotion2vec/results/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
