@@ -14,8 +14,9 @@ import config
 # ============================================================
 # EDIT THIS: Put your audio file path here
 # ============================================================
-AUDIO_FILE = r"E:\Projects\E.motion-\cnn\data\raw\RAVDESS-SPEECH\Actor_01\03-01-05-01-01-01-01.wav"
+AUDIO_FILE = r"E:\Projects\E.motion-\cnn\data\raw\RAVDESS-SPEECH\Actor_01\03-01-06-01-01-01-01.wav"
 # ============================================================
+
 
 
 def extract_melspectrogram(file_path):

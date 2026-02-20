@@ -15,6 +15,8 @@ RESULTS_DIR = os.path.join(BASE_DIR, 'results')
 # Dataset paths
 RAVDESS_PATH = os.path.join(RAW_DATA_DIR, 'RAVDESS-SPEECH')
 TESS_PATH = os.path.join(RAW_DATA_DIR, 'TESS', 'TESS Toronto emotional speech set data')
+EMOTA_PATH = os.path.join(RAW_DATA_DIR, 'EMOTA', 'TamilSER-DB')
+SINHALA_PATH = os.path.join(RAW_DATA_DIR, 'SINHALA')
 
 # Audio processing parameters for mel spectrogram
 SAMPLE_RATE = 22050
@@ -52,8 +54,8 @@ RAVDESS_EMOTIONS = {
 # TESS emotions are in folder names (e.g., OAF_angry, YAF_happy)
 TESS_EMOTIONS = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprised']
 
-# Target emotions (common to both datasets)
-EMOTIONS = ['angry', 'disgust', 'fear', 'happy', 'sad']
+# Target emotions for multilingual training (5 core emotions)
+EMOTIONS = ['angry', 'fear', 'happy', 'neutral', 'sad']
 
 # Emotion to index mapping
 EMOTION_TO_INDEX = {emotion: idx for idx, emotion in enumerate(EMOTIONS)}

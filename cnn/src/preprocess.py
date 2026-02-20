@@ -93,12 +93,22 @@ def visualize_sample_spectrograms(spectrograms, labels, save_path):
 
 
 def load_ravdess_data():
-    """Load RAVDESS dataset and extract mel spectrograms"""
+    """
+    Load RAVDESS dataset with specific filtering criteria
+    Filename format: 03-01-{emotion}-{intensity}-{statement}-{repetition}-{actor}.wav
+    
+    Criteria:
+    - Emotions: 01 (neutral), 03 (happy), 04 (sad), 05 (angry), 06 (fear)
+    - Intensity: 01 for neutral, 02 for other emotions
+    - Statement: 01 or 02
+    - Repetition: 01 or 02
+    """
     spectrograms = []
     labels = []
     file_info = []
+    skipped = 0
 
-    print("Processing RAVDESS dataset...")
+    print("Processing RAVDESS dataset with filtering...")
 
     if not os.path.exists(config.RAVDESS_PATH):
         print(f"RAVDESS path not found: {config.RAVDESS_PATH}")
@@ -114,29 +124,58 @@ def load_ravdess_data():
         audio_files = sorted([f for f in os.listdir(actor_path) if f.endswith('.wav')])
 
         for audio_file in audio_files:
-            # Parse filename: 03-01-06-01-02-01-12.wav
-            # Position 2 (0-indexed) is emotion
+            # Parse filename: 03-01-{emotion}-{intensity}-{statement}-{repetition}-{actor}.wav
             parts = audio_file.split('-')
 
-            if len(parts) >= 3:
+            if len(parts) >= 7:
                 emotion_code = parts[2]
+                intensity = parts[3]
+                statement = parts[4]
+                repetition = parts[5]
+                
                 emotion = config.RAVDESS_EMOTIONS.get(emotion_code)
 
-                if emotion in config.EMOTIONS:
-                    file_path = os.path.join(actor_path, audio_file)
-                    mel_spec = extract_melspectrogram(file_path)
+                # Apply filtering criteria
+                if emotion not in config.EMOTIONS:
+                    skipped += 1
+                    continue
+                
+                # Check intensity: neutral must be 01, others must be 02
+                if emotion == 'neutral' and intensity != '01':
+                    skipped += 1
+                    continue
+                elif emotion != 'neutral' and intensity != '02':
+                    skipped += 1
+                    continue
+                
+                # Check statement: must be 01 or 02
+                if statement not in ['01', '02']:
+                    skipped += 1
+                    continue
+                
+                # Check repetition: must be 01 or 02
+                if repetition not in ['01', '02']:
+                    skipped += 1
+                    continue
 
-                    if mel_spec is not None:
-                        spectrograms.append(mel_spec)
-                        labels.append(emotion)
-                        file_info.append({
-                            'file': audio_file,
-                            'actor': actor_folder,
-                            'emotion': emotion,
-                            'dataset': 'RAVDESS'
-                        })
+                # All criteria met - process the file
+                file_path = os.path.join(actor_path, audio_file)
+                mel_spec = extract_melspectrogram(file_path)
 
-    print(f"Loaded {len(spectrograms)} samples from RAVDESS")
+                if mel_spec is not None:
+                    spectrograms.append(mel_spec)
+                    labels.append(emotion)
+                    file_info.append({
+                        'file': audio_file,
+                        'actor': actor_folder,
+                        'emotion': emotion,
+                        'intensity': intensity,
+                        'statement': statement,
+                        'repetition': repetition,
+                        'dataset': 'RAVDESS'
+                    })
+
+    print(f"Loaded {len(spectrograms)} samples from RAVDESS (skipped {skipped} files)")
     return spectrograms, labels, file_info
 
 
@@ -185,6 +224,85 @@ def load_tess_data():
     return spectrograms, labels, file_info
 
 
+def load_emota_data():
+    """
+    Load EMOTA (Tamil) dataset
+    File naming: {speaker}_{utterance}_{emotion}.wav
+    Emotions: ang (angry), fea (fear), hap (happy), neu (neutral), sad (sad)
+    """
+    spectrograms = []
+    labels = []
+    file_info = []
+
+    print("Processing EMOTA (Tamil) dataset...")
+
+    if not os.path.exists(config.EMOTA_PATH):
+        print(f"EMOTA path not found: {config.EMOTA_PATH}")
+        print("Skipping EMOTA dataset...")
+        return [], [], []
+
+    # Emotion mapping from file suffix to standard names
+    emota_emotion_map = {
+        'ang': 'angry',
+        'fea': 'fear',
+        'hap': 'happy',
+        'neu': 'neutral',
+        'sad': 'sad'
+    }
+
+    audio_files = sorted([f for f in os.listdir(config.EMOTA_PATH) if f.endswith('.wav')])
+    
+    print(f"Found {len(audio_files)} audio files")
+
+    for audio_file in tqdm(audio_files, desc="EMOTA"):
+        # Extract emotion from filename: 01_01_ang.wav -> ang
+        parts = audio_file.replace('.wav', '').split('_')
+        
+        if len(parts) >= 3:
+            emotion_code = parts[-1]  # Last part is emotion
+            emotion = emota_emotion_map.get(emotion_code)
+            
+            if emotion and emotion in config.EMOTIONS:
+                file_path = os.path.join(config.EMOTA_PATH, audio_file)
+                mel_spec = extract_melspectrogram(file_path)
+                
+                if mel_spec is not None:
+                    spectrograms.append(mel_spec)
+                    labels.append(emotion)
+                    file_info.append({
+                        'file': audio_file,
+                        'speaker': parts[0],
+                        'utterance': parts[1],
+                        'emotion': emotion,
+                        'dataset': 'EMOTA'
+                    })
+
+    print(f"Loaded {len(spectrograms)} samples from EMOTA (Tamil)")
+    return spectrograms, labels, file_info
+
+
+def load_sinhala_data():
+    """
+    Load Sinhala dataset
+    Expected structure: SINHALA/{emotion}/{files}.wav
+    Emotions: happy, sad, fear, angry, neutral
+    """
+    spectrograms = []
+    labels = []
+    file_info = []
+
+    print("Processing Sinhala dataset...")
+
+    if not os.path.exists(config.SINHALA_PATH):
+        print(f"Sinhala path not found: {config.SINHALA_PATH}")
+        print("Skipping Sinhala dataset...")
+        return [], [], []
+
+    # TODO: Implement based on actual Sinhala structure
+    print("Sinhala loader not yet implemented - add when dataset is available")
+    return spectrograms, labels, file_info
+
+
 def preprocess_and_save():
     """Main preprocessing function"""
     print("="*70)
@@ -198,11 +316,13 @@ def preprocess_and_save():
     # Load datasets
     ravdess_specs, ravdess_labels, ravdess_info = load_ravdess_data()
     tess_specs, tess_labels, tess_info = load_tess_data()
+    emota_specs, emota_labels, emota_info = load_emota_data()
+    sinhala_specs, sinhala_labels, sinhala_info = load_sinhala_data()
 
-    # Combine
-    all_spectrograms = ravdess_specs + tess_specs
-    all_labels = ravdess_labels + tess_labels
-    all_info = ravdess_info + tess_info
+    # Combine all datasets
+    all_spectrograms = ravdess_specs + tess_specs + emota_specs + sinhala_specs
+    all_labels = ravdess_labels + tess_labels + emota_labels + sinhala_labels
+    all_info = ravdess_info + tess_info + emota_info + sinhala_info
 
     if len(all_spectrograms) == 0:
         print("\n❌ No data loaded! Check dataset paths.")
@@ -212,8 +332,10 @@ def preprocess_and_save():
     print("DATASET STATISTICS")
     print(f"{'='*70}")
     print(f"Total samples: {len(all_spectrograms)}")
-    print(f"\nRAVDESS: {len(ravdess_specs)} samples")
-    print(f"TESS: {len(tess_specs)} samples")
+    print(f"\nRAVDESS (English): {len(ravdess_specs)} samples")
+    print(f"TESS (English): {len(tess_specs)} samples")
+    print(f"EMOTA (Tamil): {len(emota_specs)} samples")
+    print(f"SINHALA: {len(sinhala_specs)} samples")
 
     # Class distribution
     print(f"\n{'='*70}")
@@ -288,7 +410,7 @@ def preprocess_and_save():
     np.save(os.path.join(config.PROCESSED_DATA_DIR, 'y_val.npy'), y_val)
     np.save(os.path.join(config.PROCESSED_DATA_DIR, 'y_test.npy'), y_test)
 
-    print(f"✓ Data saved to: {config.PROCESSED_DATA_DIR}")
+    print(f"[OK] Data saved to: {config.PROCESSED_DATA_DIR}")
 
     # Visualize sample spectrograms
     print("\nCreating sample visualizations...")
