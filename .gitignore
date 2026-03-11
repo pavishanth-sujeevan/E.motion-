@@ -1,12 +1,16 @@
 # Data files
 cnn/data/
 emotion2vec/data/
+xls-r/data/
+data/
+
 
 # Model files
 *.h5
 *.keras
 cnn/models/
 emotion2vec/models/
+xls-r/models/
 
 # Logs
 cnn/logs/

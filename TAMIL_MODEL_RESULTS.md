@@ -1,5 +1,77 @@
 # Tamil Model Training Results Summary
 
+## Latest Update: Augmentation + emotion2vec Attempts
+
+### 5. Data Augmentation + Feature-Based Classifier
+**Date**: 2024-02-21
+- **Method**: SpecAugment (time/frequency masking, noise)
+- **Data**: 654 → 2,616 samples (4x increase)
+- **Architecture**: Statistical features (100-dim) → MLP (256→128→64→5)
+- **Test Accuracy**: **36.88%** (+2.84% over baseline)
+- **Parameters**: 68,229
+
+**Per-Emotion Results**:
+- angry: 46.67% (14/30)
+- fear: 52.94% (9/17)
+- happy: 35.48% (11/31)
+- neutral: 22.58% (7/31)
+- sad: 34.38% (11/32)
+
+**Analysis**: Minor improvement through augmentation, but limited by using basic statistical features instead of pretrained embeddings.
+
+### 6. emotion2vec Integration Attempt
+- **Goal**: Use emotion2vec_base pretrained encoder (160k hours training)
+- **Result**: **FAILED**
+- **Reason**: FairSeq cannot build on Windows (build error)
+- **Alternatives tried**:
+  - wav2vec2 from HuggingFace (requires raw audio - not available)
+  - Direct checkpoint loading (requires FairSeq framework)
+
+### 7. Simple CNN on Augmented Data
+- **Goal**: Retrain best architecture with 4x data
+- **Result**: **FAILED**  
+- **Reason**: Architecture bug created 3.3M parameter model (should be 118K)
+- **Status**: Training stuck at ~25%, severe overfitting
+- **Action needed**: Fix architecture specification
+
+## Key Findings from Augmentation Work
+
+1. **Augmentation works**: Successfully created 2,616 high-quality augmented samples
+2. **Feature limitation**: Basic stats (mean/std) don't capture emotion well
+3. **Pretrained models blocked**: 
+   - emotion2vec needs FairSeq (Windows incompatible)
+   - wav2vec2 needs raw audio (only have spectrograms)
+4. **Architecture matters**: 118K params works, 3.3M params fails catastrophically
+
+## Comparison Table (All Approaches)
+
+| Model | Accuracy | Parameters | Status |
+|-------|----------|------------|--------|
+| Simple CNN (original) | **34.04%** | 118K | ✓ Best baseline |
+| Feature-based (augmented) | **36.88%** | 68K | ✓ Minor improvement |
+| Transfer Learning | 24.82% | 1.27M | ✗ Failed |
+| LSTM+Attention | 27.66% | 151K | ✗ Failed |
+| Deep CNN | 12.06% | 1.27M | ✗ Catastrophic |
+| CNN (augmented) | N/A | 3.3M | ✗ Bug - not completed |
+
+## Recommendations
+
+**Immediate (With Current Setup)**:
+1. Fix CNN architecture bug (target 118K params)
+2. Retrain Simple CNN on augmented data
+3. Expected: 40-50% accuracy
+
+**Long-term (For Major Improvement)**:
+1. Collect 1500+ more Tamil samples → 60-70% expected
+2. Use Linux VM for emotion2vec integration → 50-65% expected
+3. Obtain raw Tamil audio for proper augmentation
+
+---
+
+# Original Results Summary
+
+## Approaches Tested
+
 ## Approaches Tested
 
 ### 1. Original Deep CNN (from scratch)
