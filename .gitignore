@@ -3,6 +3,7 @@ cnn/data/
 emotion2vec/data/
 xls-r/data/
 data/
+cnn/data/raw/EmoTa/
 
 
 # Model files
@@ -16,6 +17,8 @@ xls-r/models/
 cnn/logs/
 emotion2vec/logs/
 *.log
+*.zip
+
 
 # Results
 cnn/results/
