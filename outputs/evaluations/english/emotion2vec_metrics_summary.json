@@ -1,0 +1,22 @@
+{
+  "emotion2vec_frozen": {
+    "train_accuracy": 0.3186175580221998,
+    "train_loss": 1.6022210121154785,
+    "val_accuracy": 0.3176470588235294,
+    "val_loss": 1.6020945310592651,
+    "test_accuracy": 0.3164705882352941,
+    "test_loss": 1.602197527885437,
+    "epochs_run": null,
+    "epochs_note": "Original run epoch count not persisted in checkpoint"
+  },
+  "emotion2vec_finetuned": {
+    "train_accuracy": 0.1823915237134208,
+    "train_loss": 8.349552154541016,
+    "val_accuracy": 0.17882352941176471,
+    "val_loss": 8.317163467407227,
+    "test_accuracy": 0.18352941176470589,
+    "test_loss": 8.292888641357422,
+    "epochs_run": null,
+    "epochs_note": "Original run was partial and stopped early; epoch count not persisted"
+  }
+}
