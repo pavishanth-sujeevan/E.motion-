@@ -5,6 +5,9 @@ xls-r/data/
 data/
 cnn/data/raw/EmoTa/
 
+#features
+emotion2vec/features/
+
 
 # Model files
 *.h5
