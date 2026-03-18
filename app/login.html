@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — E.motion³</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--orange:#E8714A;--bg:#F5F0EA;--text:#1C1C1C;--muted:#8A8A8A;--input:#ECEAE4;--grad:linear-gradient(135deg,#E8714A,#F5A470);--left:linear-gradient(145deg,#D9603A,#E8714A 40%,#F5A470 75%,#F9C89A)}
+    body{font-family:'DM Sans',sans-serif;display:flex;min-height:100vh;background:var(--bg)}
+    .left{width:46%;background:var(--left);display:flex;flex-direction:column;justify-content:center;padding:64px;color:#fff;flex-shrink:0}
+    .left .brand{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:700;margin-bottom:20px;line-height:1.1}
+    .left p{font-size:1rem;line-height:1.7;opacity:.92;max-width:330px}
+    .left .emojis{display:flex;gap:18px;margin-top:34px;font-size:2.2rem}
+    .left .emojis span{display:inline-block;animation:float 3s ease-in-out infinite}
+    .left .emojis span:nth-child(2){animation-delay:.5s}
+    .left .emojis span:nth-child(3){animation-delay:1s}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    .right{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 40px}
+    .form-box{width:100%;max-width:400px}
+    .form-box h2{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);margin-bottom:6px}
+    .subtitle{font-size:.9rem;color:var(--muted);margin-bottom:36px}
+    .field{margin-bottom:20px}
+    .field-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+    .field label,.field-top label{display:block;font-size:.87rem;font-weight:500;color:var(--text)}
+    .forgot{font-size:.82rem;color:var(--orange);text-decoration:none}
+    .forgot:hover{text-decoration:underline}
+    .input-wrap{display:flex;align-items:center;background:var(--input);border-radius:14px;border:1.5px solid transparent;transition:border-color .2s}
+    .input-wrap:focus-within{border-color:var(--orange);background:#fff}
+    .input-wrap .ico{padding:0 14px;color:#b0a898;font-size:1rem;flex-shrink:0}
+    .input-wrap input{flex:1;background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);padding:14px 0}
+    .input-wrap input::placeholder{color:#c0b8b0}
+    .toggle{background:none;border:none;cursor:pointer;padding:0 14px;color:#b0a898;font-size:1rem;display:flex;align-items:center}
+    .toggle:hover{color:var(--orange)}
+    .btn-submit{width:100%;background:var(--grad);color:#fff;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;padding:15px;cursor:pointer;margin-top:6px;transition:opacity .2s,transform .15s}
+    .btn-submit:hover{opacity:.87;transform:translateY(-1px)}
+    .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .alt{text-align:center;margin-top:20px;font-size:.87rem;color:var(--muted)}
+    .alt a{color:var(--orange);text-decoration:none;font-weight:500}
+    .alt a:hover{text-decoration:underline}
+    .err{background:#ffeaea;border:1px solid #f5c0c0;border-radius:10px;padding:11px 16px;font-size:.85rem;color:#c0392b;margin-bottom:18px;display:none}
+    .err.show{display:block;animation:fadeUp .2s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:700px){body{flex-direction:column}.left{width:100%;padding:36px 28px;min-height:200px}.right{padding:36px 22px}}
+  </style>
+</head>
+<body>
+<div class="left">
+  <div class="brand">E.motion³</div>
+  <p>Your multilingual emotion regulation assistant. Understand, express, and navigate your feelings — in any language.</p>
+  <div class="emojis"><span>😊</span><span>🌍</span><span>💬</span></div>
+</div>
+<div class="right">
+  <div class="form-box">
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to continue your emotional journey</p>
+    <div class="err" id="err"></div>
+    <div class="field">
+      <label>Email or Username</label>
+      <div class="input-wrap">
+        <span class="ico">✉️</span>
+        <input type="text" id="username" placeholder="hello@example.com or admin" autocomplete="username"/>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-top">
+        <label>Password</label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+      <div class="input-wrap">
+        <span class="ico">🔒</span>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button class="toggle" type="button" onclick="togglePw('password',this)">👁️</button>
+      </div>
+    </div>
+    <button class="btn-submit" id="loginBtn" onclick="doLogin()">Sign In</button>
+    <p class="alt">Don't have an account? <a href="signup.html">Sign up</a></p>
+  </div>
+</div>
+<script>
+const API='http://localhost:5000';
+function togglePw(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁️':'🙈'}
+async function doLogin(){
+  const u=document.getElementById('username').value.trim();
+  const p=document.getElementById('password').value.trim();
+  const btn=document.getElementById('loginBtn');
+  const err=document.getElementById('err');
+  if(!u||!p){err.textContent='Please enter your username and password.';err.classList.add('show');return}
+  btn.disabled=true;btn.textContent='Signing in…';err.classList.remove('show');
+  try{
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(d.success){localStorage.setItem('emotion3_user',JSON.stringify(d.user));window.location.href='chat.html';}
+    else{err.textContent=d.error||'Invalid credentials.';err.classList.add('show');btn.disabled=false;btn.textContent='Sign In';}
+  }catch(e){err.textContent='⚠️ Cannot connect to server. Make sure Flask is running: py app.py';err.classList.add('show');btn.disabled=false;btn.textContent='Sign In';}
+}
+</script>
+</body>
+</html>

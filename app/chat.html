@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>E.motion³ — Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--orange:#E8714A;--bg:#F5F0EA;--sidebar:#EDE8E1;--text:#1C1C1C;--muted:#8A8A8A;--input:#ECEAE4;--border:rgba(0,0,0,0.08);--grad:linear-gradient(135deg,#E8714A,#F5A470)}
+    html,body{height:100%;overflow:hidden}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex}
+
+    /* SIDEBAR */
+    .sidebar{width:280px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 18px;flex-shrink:0;border-right:1px solid var(--border)}
+    .sidebar-logo{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:22px;padding-left:4px;color:var(--text)}
+    .btn-new{display:flex;align-items:center;gap:10px;background:#fff;border:none;border-radius:12px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--text);cursor:pointer;width:100%;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:box-shadow .18s,transform .15s}
+    .btn-new:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-1px)}
+    .sec-label{font-size:.7rem;font-weight:500;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;padding-left:6px}
+    .conv-list{flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+    .conv-item{padding:10px 12px;border-radius:10px;font-size:.86rem;color:var(--text);cursor:pointer;transition:background .14s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .conv-item:hover{background:rgba(0,0,0,.06)}
+    .conv-item.active{background:rgba(232,113,74,.12);color:var(--orange);font-weight:500}
+    .sidebar-bottom{border-top:1px solid var(--border);padding-top:14px;margin-top:12px}
+    .user-row{display:flex;align-items:center;gap:10px;padding:4px 4px 10px}
+    .avatar{width:32px;height:32px;background:var(--grad);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#fff;font-weight:600;flex-shrink:0}
+    .uname{font-size:.85rem;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .signout{display:flex;align-items:center;gap:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--muted);cursor:pointer;padding:8px 4px;transition:color .18s;width:100%}
+    .signout:hover{color:var(--orange)}
+
+    /* MAIN */
+    .chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:14px}
+    .menu-btn{background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted);line-height:1}
+    .topbar-info h3{font-family:'Playfair Display',serif;font-size:1rem}
+    .topbar-info p{font-size:.75rem;color:var(--muted);margin-top:1px}
+    .sample-btn{background:#fff;border:1.5px solid #ddd;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.82rem;padding:8px 18px;cursor:pointer;color:var(--text);transition:border-color .2s;text-decoration:none;display:inline-block}
+    .sample-btn:hover{border-color:var(--orange)}
+
+    /* PIPELINE */
+    .pipeline{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 20px;background:#fff;border-bottom:1px solid var(--border);font-size:.73rem;color:var(--muted);flex-shrink:0}
+    .ps{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;background:var(--input);transition:background .25s,color .25s}
+    .ps.on{background:var(--grad);color:#fff}
+    .pa{color:#ccc;font-size:.7rem}
+
+    /* MESSAGES */
+    .messages{flex:1;overflow-y:auto;padding:32px 52px;display:flex;flex-direction:column;gap:14px}
+    .messages::-webkit-scrollbar{width:4px}
+    .messages::-webkit-scrollbar-thumb{background:rgba(0,0,0,.09);border-radius:99px}
+    .msg-row{display:flex;flex-direction:column}
+    .msg-row.user{align-items:flex-end}
+    .msg-row.bot{align-items:flex-start}
+    .itag{font-size:.7rem;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+    .msg-row.user .itag{justify-content:flex-end}
+    .bubble{max-width:540px;padding:16px 20px;font-size:.9rem;line-height:1.68;animation:popIn .24s ease}
+    .bubble.bot{background:#fff;color:var(--text);border-radius:20px 20px 20px 5px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .bubble.user{background:var(--grad);color:#fff;border-radius:20px 20px 5px 20px}
+    .emotion-chip{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;background:rgba(232,113,74,.1);color:var(--orange);border-radius:50px;padding:3px 10px;margin-top:8px}
+    @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .typing-row{display:flex;align-items:flex-start}
+    .typing-bub{background:#fff;border-radius:20px 20px 20px 5px;padding:14px 20px;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;gap:5px;align-items:center;animation:popIn .22s ease}
+    .dot{width:7px;height:7px;background:var(--orange);border-radius:50%;animation:bounce 1.2s infinite}
+    .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+    @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+
+    /* INPUT */
+    .input-area{padding:14px 24px 18px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
+    .input-bar{display:flex;align-items:center;gap:10px;background:#fff;border-radius:50px;padding:8px 8px 8px 22px;box-shadow:0 2px 14px rgba(0,0,0,.08)}
+    .input-bar input{flex:1;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);background:transparent}
+    .input-bar input::placeholder{color:#c0b8b0}
+    .mic-btn,.send-btn{width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transition:transform .14s,opacity .18s;flex-shrink:0}
+    .mic-btn{background:var(--input);color:var(--muted)}
+    .mic-btn:hover{background:#e0dbd3}
+    .mic-btn.rec{background:#ffe5e5;color:#e84a4a;animation:pulseR 1s infinite}
+    @keyframes pulseR{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(232,74,74,.4)}50%{transform:scale(1.08);box-shadow:0 0 0 8px rgba(232,74,74,0)}}
+    .send-btn{background:var(--grad);color:#fff}
+    .send-btn:hover{opacity:.86;transform:scale(1.06)}
+    .send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .hint{text-align:center;font-size:.73rem;color:var(--muted);margin-top:9px}
+    @media(max-width:768px){.sidebar{display:none}.messages{padding:20px 16px}}
+  </style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">E.motion³</div>
+  <button class="btn-new" onclick="newConv()"><span style="font-size:1.2rem;line-height:1">＋</span> New Conversation</button>
+  <div class="sec-label">Recent</div>
+  <div class="conv-list" id="convList"></div>
+  <div class="sidebar-bottom">
+    <div class="user-row">
+      <div class="avatar" id="uAvatar">?</div>
+      <div class="uname"  id="uName">Guest</div>
+    </div>
+    <button class="signout" onclick="signOut()">↩ Sign Out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="chat-main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-info"><h3>E.motion³</h3><p>Emotion Regulation Assistant</p></div>
+    </div>
+    <a href="sample-chats.html" class="sample-btn">Sample Chats</a>
+  </div>
+
+  <div class="pipeline" id="pipeline">
+    <div class="ps" id="ps-in">🎤 Input</div>
+    <div class="pa">→</div>
+    <div class="ps" id="ps-mod">🧠 SER/TER</div>
+    <div class="pa">→</div>
+    <div class="ps" id="ps-llm">💬 LLM</div>
+    <div class="pa" id="pa-tts">→</div>
+    <div class="ps" id="ps-tts">🔊 TTS</div>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input-area">
+    <div class="input-bar">
+      <input type="text" id="userInput" placeholder="Type how you're feeling…" autocomplete="off" onkeydown="if(event.key==='Enter')sendText()"/>
+      <button class="mic-btn" id="micBtn" onclick="toggleRec()" title="Click to speak">🎙️</button>
+      <button class="send-btn" id="sendBtn" onclick="sendText()">➤</button>
+    </div>
+    <p class="hint">E.motion³ supports English, Tamil &amp; Sinhala — type or speak in your preferred language.</p>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:5000';
+let convId=genId(),convs=JSON.parse(localStorage.getItem('e3_convs')||'{}');
+let isRec=false,mediaRec=null,chunks=[],speechRec=null,curTranscript='';
+
+// ── INIT ──
+(function(){
+  const user=JSON.parse(localStorage.getItem('emotion3_user')||'null');
+  if(!user){window.location.href='login.html';return}
+  document.getElementById('uName').textContent=user.name;
+  document.getElementById('uAvatar').textContent=user.name.charAt(0).toUpperCase();
+  renderList();
+  greeting();
+})();
+
+function genId(){return'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,6)}
+
+// ── CONVERSATIONS ──
+function saveConvs(){localStorage.setItem('e3_convs',JSON.stringify(convs))}
+function renderList(){
+  const el=document.getElementById('convList');el.innerHTML='';
+  const ids=Object.keys(convs).reverse();
+  if(!ids.length){el.innerHTML='<div style="font-size:.8rem;color:var(--muted);padding:8px 12px">No conversations yet</div>';return}
+  ids.forEach(id=>{
+    const d=document.createElement('div');
+    d.className='conv-item'+(id===convId?' active':'');
+    d.textContent=convs[id].title||'Untitled';
+    d.onclick=()=>loadConv(id);
+    el.appendChild(d);
+  });
+}
+function loadConv(id){
+  convId=id;document.getElementById('messages').innerHTML='';
+  const c=convs[id];
+  if(c&&c.msgs)c.msgs.forEach(m=>addBubble(m.role,m.content,m.itype,null,false));
+  renderList();
+}
+function newConv(){
+  convId=genId();document.getElementById('messages').innerHTML='';greeting();renderList();
+}
+function greeting(){
+  addBubble('bot',"Hello! I'm <strong>E.motion³</strong>, your emotion regulation assistant. 🌱<br>How are you feeling today? You can type or speak — I'm here to listen in any language.",null,null,false);
+}
+
+// ── PIPELINE ──
+const PS=['ps-in','ps-mod','ps-llm','ps-tts'];
+function pReset(){PS.forEach(s=>document.getElementById(s).classList.remove('on'));['pa-tts','ps-tts'].forEach(s=>{const el=document.getElementById(s);if(el)el.style.opacity='1'})}
+async function pAnimate(steps,voice){
+  pReset();
+  if(!voice){['pa-tts','ps-tts'].forEach(s=>{const el=document.getElementById(s);if(el)el.style.opacity='.25'})}
+  for(const s of steps){document.getElementById(s).classList.add('on');await wait(400)}
+}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+
+// ── BUBBLES ──
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fmt(s){return s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')}
+function eEmoji(e){return{happy:'😊',sad:'😢',anxious:'😟',angry:'😠',disgust:'🤢',neutral:'😌'}[e]||'💭'}
+
+function addBubble(role,text,itype,emotion,anim=true){
+  const wrap=document.getElementById('messages');
+  const row=document.createElement('div');row.className='msg-row '+(role==='user'?'user':'bot');
+  if(role==='user'&&itype){const t=document.createElement('div');t.className='itag';t.innerHTML=itype==='voice'?'🎙️ Voice input':'💬 Text input';row.appendChild(t)}
+  const b=document.createElement('div');b.className='bubble '+(role==='user'?'user':'bot');
+  b.innerHTML=role==='user'?esc(text):fmt(text);row.appendChild(b);
+  if(role==='bot'&&emotion){const c=document.createElement('div');c.className='emotion-chip';c.innerHTML=eEmoji(emotion)+' Detected: <strong>'+emotion+'</strong>';row.appendChild(c)}
+  if(!anim)b.style.animation='none';
+  wrap.appendChild(row);wrap.scrollTop=wrap.scrollHeight;return row;
+}
+function showTyping(){
+  const w=document.getElementById('messages');
+  const r=document.createElement('div');r.className='typing-row';r.id='typing';
+  r.innerHTML='<div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  w.appendChild(r);w.scrollTop=w.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+
+// ── TEXT PIPELINE: text → TER → LLM ──
+async function sendText(){
+  const inp=document.getElementById('userInput');
+  const txt=inp.value.trim();if(!txt)return;
+  inp.value='';document.getElementById('sendBtn').disabled=true;
+  addBubble('user',txt,'text',null);save('user',txt,'text');
+  pAnimate(['ps-in','ps-mod','ps-llm'],false);showTyping();
+  try{
+    const r=await fetch(API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:txt,conv_id:convId})});
+    const d=await r.json();
+    hideTyping();pReset();
+    addBubble('bot',d.reply,null,d.emotion);save('bot',d.reply,'text');
+    setTitle(txt);
+  }catch(e){hideTyping();pReset();addBubble('bot','⚠️ Cannot reach server. Run: <strong>py app.py</strong>');}
+  document.getElementById('sendBtn').disabled=false;
+}
+
+// ── VOICE PIPELINE: audio → SER → LLM → TTS ──
+async function toggleRec(){if(!isRec)await startRec();else stopRec()}
+async function startRec(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRec=new MediaRecorder(stream);chunks=[];curTranscript='';
+    mediaRec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data)};
+    mediaRec.onstop=handleStop;mediaRec.start(100);
+    isRec=true;
+    document.getElementById('micBtn').classList.add('rec');
+    document.getElementById('micBtn').title='Click to stop';
+    // Web Speech API for live transcript
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(SR){
+      speechRec=new SR();speechRec.continuous=true;speechRec.interimResults=true;
+      speechRec.onresult=e=>{
+        let fin='',int='';
+        for(let i=e.resultIndex;i<e.results.length;i++){
+          if(e.results[i].isFinal)fin+=e.results[i][0].transcript;
+          else int+=e.results[i][0].transcript;
+        }
+        if(fin)curTranscript+=fin+' ';
+        document.getElementById('userInput').placeholder=(curTranscript+int).trim()||'🎙️ Listening…';
+      };
+      speechRec.onerror=()=>{};speechRec.start();
+    }else{
+      document.getElementById('userInput').placeholder='🎙️ Recording…';
+    }
+  }catch(e){alert('Microphone access denied. Please allow microphone access in your browser settings.')}
+}
+function stopRec(){
+  isRec=false;
+  document.getElementById('micBtn').classList.remove('rec');
+  document.getElementById('micBtn').title='Click to speak';
+  document.getElementById('userInput').placeholder="Type how you're feeling…";
+  if(speechRec){try{speechRec.stop()}catch(e){};speechRec=null}
+  if(mediaRec&&mediaRec.state!=='inactive'){mediaRec.stop();mediaRec.stream.getTracks().forEach(t=>t.stop())}
+}
+async function handleStop(){
+  const transcript=curTranscript.trim()||'[Voice message]';
+  const blob=new Blob(chunks,{type:'audio/webm'});
+  addBubble('user',transcript,'voice',null);save('user',transcript,'voice');
+  pAnimate(['ps-in','ps-mod','ps-llm','ps-tts'],true);showTyping();
+  try{
+    const form=new FormData();
+    form.append('audio',blob,'rec.webm');
+    form.append('transcript',transcript);
+    form.append('conv_id',convId);
+    const r=await fetch(API+'/speech',{method:'POST',body:form});
+    const d=await r.json();
+    hideTyping();pReset();
+    addBubble('bot',d.reply,null,d.emotion);save('bot',d.reply,'voice');setTitle(transcript);
+    if(d.audio_url){new Audio(API+d.audio_url).play().catch(()=>{})}
+  }catch(e){hideTyping();pReset();addBubble('bot','⚠️ Cannot reach server. Run: <strong>py app.py</strong>')}
+}
+
+// ── HELPERS ──
+function save(role,content,itype){
+  if(!convs[convId])convs[convId]={title:'New conversation',msgs:[]};
+  convs[convId].msgs.push({role,content,itype});saveConvs();
+}
+function setTitle(msg){
+  if(!convs[convId])return;
+  if(convs[convId].title==='New conversation'){convs[convId].title=msg.slice(0,32)+(msg.length>32?'…':'');saveConvs();renderList();}
+}
+function toggleSidebar(){
+  const s=document.querySelector('.sidebar');
+  s.style.display=s.style.display==='none'?'flex':'none';
+}
+function signOut(){localStorage.removeItem('emotion3_user');window.location.href='login.html'}
+</script>
+</body>
+</html>

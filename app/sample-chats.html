@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sample Conversations — E.motion³</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--orange:#E8714A;--bg:#F5F0EA;--text:#1C1C1C;--muted:#8A8A8A;--card:#fff;--grad:linear-gradient(135deg,#E8714A,#F5A470);--border:rgba(0,0,0,0.08)}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{display:flex;align-items:center;gap:14px;padding:20px 40px;border-bottom:1px solid var(--border);background:rgba(245,240,234,.94);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+    .back{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);transition:color .18s;text-decoration:none;display:flex;align-items:center;padding:4px}
+    .back:hover{color:var(--orange)}
+    .topbar-info h2{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600}
+    .topbar-info p{font-size:.75rem;color:var(--muted)}
+    .content{max-width:740px;margin:0 auto;padding:40px 20px 80px;display:flex;flex-direction:column;gap:28px;animation:fadeUp .5s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .scard{background:var(--card);border-radius:20px;padding:28px;box-shadow:0 2px 14px rgba(0,0,0,.05)}
+    .chead{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+    .cemoji{font-size:1.9rem}
+    .ctitle h3{font-size:1rem;font-weight:600}
+    .lang{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--muted);margin-top:3px}
+    .thread{display:flex;flex-direction:column;gap:12px}
+    .bu{align-self:flex-end;background:var(--grad);color:#fff;border-radius:18px 18px 4px 18px;padding:14px 18px;max-width:80%;font-size:.87rem;line-height:1.58}
+    .itag{font-size:.7rem;opacity:.82;display:flex;align-items:center;gap:4px;margin-bottom:5px}
+    .ba{align-self:flex-start;background:#F7F4EE;color:var(--text);border-radius:18px 18px 18px 4px;padding:16px 20px;max-width:88%;font-size:.87rem;line-height:1.68}
+    .ba strong{color:var(--text)}
+    .cta{text-align:center;padding:10px 0 20px}
+    .cta p{color:var(--muted);font-size:.88rem;margin-bottom:18px}
+    .btn-primary{background:var(--grad);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;padding:14px 36px;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s,transform .15s;box-shadow:0 4px 18px rgba(232,113,74,.3)}
+    .btn-primary:hover{opacity:.87;transform:translateY(-2px)}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="javascript:history.back()" class="back">←</a>
+  <div class="topbar-info"><h2>Sample Conversations</h2><p>See how E.motion³ responds to different emotions</p></div>
+</div>
+<div class="content">
+
+  <div class="scard">
+    <div class="chead"><div class="cemoji">😰</div><div class="ctitle"><h3>Managing Anxiety</h3><div class="lang">🌐 English</div></div></div>
+    <div class="thread">
+      <div class="bu"><div class="itag">💬 Text input</div>I have a big presentation tomorrow and I can't stop worrying about it.</div>
+      <div class="ba">Pre-event anxiety is very common and shows you care about doing well. 🌟<br>Let's reframe: <strong>What's the worst that could realistically happen?</strong> Anxiety inflates risks far beyond reality.<br>Try the <strong>5-4-3-2-1 grounding technique</strong> tonight before bed to calm your nervous system.</div>
+      <div class="bu"><div class="itag">🎙️ Voice input</div>What if I forget what I want to say?</div>
+      <div class="ba">That fear is normal! Here are some strategies:<br><strong>Bullet points, not scripts</strong> — easier to recall<br><strong>Practice out loud</strong> 2-3 times — not more<br><strong>Pause when needed</strong> — silence feels longer to you than your audience<br>You're more prepared than you think. 🌟</div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="chead"><div class="cemoji">😢</div><div class="ctitle"><h3>தனிமையும் சோகமும்</h3><div class="lang">🌐 Tamil</div></div></div>
+    <div class="thread">
+      <div class="bu"><div class="itag">🎙️ Voice input</div>சமீபத்தில் நான் மிகவும் தனிமையாக உணர்கிறேன், மக்கள் கூடும்போதும் கூட...</div>
+      <div class="ba">இதை என்னிடம் பகிர்ந்ததற்கு நன்றி. மற்றவர்கள் மத்தியில் தனிமை உணர்வது மிகவும் பொதுவானது. 💙<br><strong>உண்மையான இணைப்பின் தேவையைக்</strong> குறிக்கலாம்.<br>உங்கள் தற்போதைய உறவுகளில் எதை மிகவும் இழக்கிறீர்கள்?</div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="chead"><div class="cemoji">😩</div><div class="ctitle"><h3>වැඩ ආතතිය</h3><div class="lang">🌐 Sinhala</div></div></div>
+    <div class="thread">
+      <div class="bu"><div class="itag">🎙️ Voice input</div>මම ඉතා ශ්‍රාන්ත වී ඇත. සෑම උදෑසනකම කාර්යාලයට යාමට බය වෙනවා.</div>
+      <div class="ba">ඔබ විස්තර කරන දේ <strong>ආතතිය</strong> ලෙස පෙනේ — එය හඳුනා ගැනීම වැදගත් පළමු පියවරකි. 🔥<br>ආතතිය සාමාන්‍ය වෙහෙස නොවේ. <strong>හැඟීම් වෙහෙස</strong>, කාර්යය කෙරෙහි නිශේධ ආකල්ප, ජය ගැනීමේ හැඟීම අඩුවීම — මේ කුමක් ඔබට දැනෙනවාද?</div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="chead"><div class="cemoji">🔥</div><div class="ctitle"><h3>Work Burnout</h3><div class="lang">🌐 English</div></div></div>
+    <div class="thread">
+      <div class="bu"><div class="itag">🎙️ Voice input</div>I feel completely drained. I used to love my job but now I dread every morning.</div>
+      <div class="ba">What you're describing sounds like <strong>burnout</strong> — recognizing it is an important first step. 🔥<br>Burnout often involves: <strong>Emotional exhaustion</strong>, <strong>Cynicism toward work</strong>, and a <strong>reduced sense of accomplishment</strong>.<br>Which of these resonates most with you right now?</div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <p>Ready to start your own conversation?</p>
+    <a href="chat.html" class="btn-primary">Start Chatting</a>
+  </div>
+</div>
+</body>
+</html>

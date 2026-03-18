@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Account — E.motion³</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--orange:#E8714A;--bg:#F5F0EA;--text:#1C1C1C;--muted:#8A8A8A;--input:#ECEAE4;--grad:linear-gradient(135deg,#E8714A,#F5A470);--left:linear-gradient(145deg,#D9603A,#E8714A 40%,#F5A470 75%,#F9C89A)}
+    body{font-family:'DM Sans',sans-serif;display:flex;min-height:100vh;background:var(--bg)}
+    .left{width:46%;background:var(--left);display:flex;flex-direction:column;justify-content:center;padding:64px;color:#fff;flex-shrink:0}
+    .left .brand{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:700;margin-bottom:20px;line-height:1.1}
+    .left p{font-size:1rem;line-height:1.7;opacity:.92;max-width:330px}
+    .left .emojis{display:flex;gap:18px;margin-top:34px;font-size:2.2rem}
+    .left .emojis span{display:inline-block;animation:float 3s ease-in-out infinite}
+    .left .emojis span:nth-child(2){animation-delay:.5s}
+    .left .emojis span:nth-child(3){animation-delay:1s}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    .right{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 40px}
+    .form-box{width:100%;max-width:400px}
+    .form-box h2{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);margin-bottom:6px}
+    .subtitle{font-size:.9rem;color:var(--muted);margin-bottom:34px}
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:.87rem;font-weight:500;color:var(--text);margin-bottom:9px}
+    .input-wrap{display:flex;align-items:center;background:var(--input);border-radius:14px;border:1.5px solid transparent;transition:border-color .2s}
+    .input-wrap:focus-within{border-color:var(--orange);background:#fff}
+    .input-wrap .ico{padding:0 14px;color:#b0a898;font-size:1rem;flex-shrink:0}
+    .input-wrap input{flex:1;background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);padding:14px 0}
+    .input-wrap input::placeholder{color:#c0b8b0}
+    .toggle{background:none;border:none;cursor:pointer;padding:0 14px;color:#b0a898;font-size:1rem;display:flex;align-items:center}
+    .toggle:hover{color:var(--orange)}
+    .pw-bars{display:flex;gap:5px;margin-top:6px}
+    .pw-bar{flex:1;height:3px;border-radius:99px;background:#ddd;transition:background .3s}
+    .btn-submit{width:100%;background:var(--grad);color:#fff;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;padding:15px;cursor:pointer;margin-top:8px;transition:opacity .2s,transform .15s}
+    .btn-submit:hover{opacity:.87;transform:translateY(-1px)}
+    .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .alt{text-align:center;margin-top:20px;font-size:.87rem;color:var(--muted)}
+    .alt a{color:var(--orange);text-decoration:none;font-weight:500}
+    .alt a:hover{text-decoration:underline}
+    .msg{border-radius:10px;padding:11px 16px;font-size:.85rem;margin-bottom:18px;display:none}
+    .msg.show{display:block;animation:fadeUp .2s ease}
+    .msg.err{background:#ffeaea;border:1px solid #f5c0c0;color:#c0392b}
+    .msg.suc{background:#eaffea;border:1px solid #b0e0b0;color:#1a7a2a}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:700px){body{flex-direction:column}.left{width:100%;padding:36px 28px;min-height:200px}.right{padding:36px 22px}}
+  </style>
+</head>
+<body>
+<div class="left">
+  <div class="brand">E.motion³</div>
+  <p>Your multilingual emotion regulation assistant. Understand, express, and navigate your feelings — in any language.</p>
+  <div class="emojis"><span>😊</span><span>🌍</span><span>💬</span></div>
+</div>
+<div class="right">
+  <div class="form-box">
+    <h2>Create account</h2>
+    <p class="subtitle">Start your journey to emotional well-being</p>
+    <div class="msg err" id="err"></div>
+    <div class="msg suc" id="suc"></div>
+    <div class="field">
+      <label>Full Name</label>
+      <div class="input-wrap"><span class="ico">👤</span><input type="text" id="name" placeholder="Your name" autocomplete="name"/></div>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <div class="input-wrap"><span class="ico">✉️</span><input type="email" id="email" placeholder="hello@example.com" autocomplete="email"/></div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="input-wrap">
+        <span class="ico">🔒</span>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="new-password" oninput="checkStr(this.value)" onkeydown="if(event.key==='Enter')doSignup()"/>
+        <button class="toggle" type="button" onclick="togglePw('password',this)">👁️</button>
+      </div>
+      <div class="pw-bars"><div class="pw-bar" id="s1"></div><div class="pw-bar" id="s2"></div><div class="pw-bar" id="s3"></div><div class="pw-bar" id="s4"></div></div>
+    </div>
+    <button class="btn-submit" id="signupBtn" onclick="doSignup()">Create Account</button>
+    <p class="alt">Already have an account? <a href="login.html">Sign in</a></p>
+  </div>
+</div>
+<script>
+const API='http://localhost:5000';
+function togglePw(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁️':'🙈'}
+function checkStr(pw){
+  const cols=['#e84a4a','#f5a523','#f0c020','#2ecc71'];
+  let s=0;if(pw.length>=6)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+  [1,2,3,4].forEach(i=>{document.getElementById('s'+i).style.background=i<=s?cols[s-1]:'#ddd'});
+}
+async function doSignup(){
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const pw=document.getElementById('password').value;
+  const btn=document.getElementById('signupBtn');
+  const err=document.getElementById('err');const suc=document.getElementById('suc');
+  err.classList.remove('show');suc.classList.remove('show');
+  if(!name||!email||!pw){err.textContent='All fields are required.';err.classList.add('show');return}
+  if(pw.length<4){err.textContent='Password must be at least 4 characters.';err.classList.add('show');return}
+  btn.disabled=true;btn.textContent='Creating account…';
+  try{
+    const r=await fetch(API+'/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pw})});
+    const d=await r.json();
+    if(d.success){localStorage.setItem('emotion3_user',JSON.stringify(d.user));suc.textContent='Welcome, '+d.user.name+'! Redirecting…';suc.classList.add('show');setTimeout(()=>window.location.href='chat.html',1200);}
+    else{err.textContent=d.error||'Signup failed.';err.classList.add('show');btn.disabled=false;btn.textContent='Create Account';}
+  }catch(e){err.textContent='⚠️ Cannot connect to server. Make sure Flask is running: py app.py';err.classList.add('show');btn.disabled=false;btn.textContent='Create Account';}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>E.motion³ — Feel understood, in any language</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--orange:#E8714A;--orange2:#F5A470;--bg:#F5F0EA;--text:#1C1C1C;--muted:#8A8A8A;--card:#fff;--grad:linear-gradient(135deg,#E8714A,#F5A470)}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:20px 60px;position:sticky;top:0;background:rgba(245,240,234,0.95);backdrop-filter:blur(14px);z-index:100;border-bottom:1px solid rgba(0,0,0,0.05)}
+    .logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--text);text-decoration:none;font-weight:700}
+    .nav-right{display:flex;align-items:center;gap:12px}
+    .btn-ghost{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:0.93rem;color:var(--text);cursor:pointer;padding:9px 20px;border-radius:50px;text-decoration:none;display:inline-block;transition:background .18s}
+    .btn-ghost:hover{background:rgba(0,0,0,0.05)}
+    .btn-orange{background:var(--grad);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:0.93rem;font-weight:500;padding:10px 24px;border-radius:50px;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s,transform .15s}
+    .btn-orange:hover{opacity:.87;transform:translateY(-1px)}
+    .hero{text-align:center;padding:80px 20px 56px;animation:fadeUp .6s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    .emoji-row{display:flex;justify-content:center;gap:16px;font-size:2.1rem;margin-bottom:32px}
+    .emoji-row span{display:inline-block;animation:float 3s ease-in-out infinite}
+    .emoji-row span:nth-child(2){animation-delay:.4s}
+    .emoji-row span:nth-child(3){animation-delay:.8s}
+    .emoji-row span:nth-child(4){animation-delay:1.2s}
+    .emoji-row span:nth-child(5){animation-delay:1.6s}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    h1{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.12;max-width:700px;margin:0 auto 22px;font-weight:700}
+    h1 .accent{color:var(--orange)}
+    .subtitle{color:var(--muted);font-size:1.05rem;max-width:500px;margin:0 auto 42px;line-height:1.7}
+    .hero-btns{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+    .btn-primary{background:var(--grad);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;padding:15px 34px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:opacity .2s,transform .15s;box-shadow:0 4px 18px rgba(232,113,74,.35)}
+    .btn-primary:hover{opacity:.87;transform:translateY(-2px)}
+    .btn-outline{background:#fff;border:1.5px solid #ddd;color:var(--text);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;padding:14px 30px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:border-color .2s,transform .15s}
+    .btn-outline:hover{border-color:var(--orange);transform:translateY(-2px)}
+    .lang-strip{display:flex;justify-content:center;gap:12px;margin:0 auto 60px;flex-wrap:wrap;animation:fadeUp .7s ease .15s both}
+    .lang-badge{background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:50px;padding:8px 20px;font-size:.84rem;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;margin:0 auto;padding:0 24px 80px;animation:fadeUp .8s ease .25s both}
+    .card{background:var(--card);border-radius:20px;padding:32px 26px;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .22s,box-shadow .22s}
+    .card:hover{transform:translateY(-5px);box-shadow:0 8px 28px rgba(0,0,0,.09)}
+    .card-icon{width:52px;height:52px;background:var(--grad);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:18px}
+    .card h3{font-size:1rem;font-weight:600;margin-bottom:10px}
+    .card p{font-size:.88rem;color:var(--muted);line-height:1.65}
+    @media(max-width:700px){nav{padding:16px 20px}.features{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">E.motion³</a>
+  <div class="nav-right">
+    <a href="login.html" class="btn-ghost">Sign In</a>
+    <a href="signup.html" class="btn-orange">Get Started</a>
+  </div>
+</nav>
+<main>
+  <section class="hero">
+    <div class="emoji-row"><span>😊</span><span>😢</span><span>🥰</span><span>😌</span><span>🌍</span></div>
+    <h1>Feel understood, <span class="accent">in any language</span></h1>
+    <p class="subtitle">E.motion³ recognizes your emotions through speech and text, offering compassionate guidance in your preferred language.</p>
+    <div class="hero-btns">
+      <a href="signup.html" class="btn-primary">Start Your Journey →</a>
+      <a href="sample-chats.html" class="btn-outline">View Sample Chats</a>
+    </div>
+  </section>
+  <div class="lang-strip">
+    <div class="lang-badge">🇬🇧 English</div>
+    <div class="lang-badge">🇱🇰 Tamil</div>
+    <div class="lang-badge">🇱🇰 Sinhala</div>
+  </div>
+  <section class="features">
+    <div class="card"><div class="card-icon">🎙️</div><h3>Voice &amp; Text</h3><p>Speak or type — E.motion³ understands both and responds with empathy in real time.</p></div>
+    <div class="card"><div class="card-icon">🌐</div><h3>Multilingual</h3><p>Express yourself in English, Tamil, or Sinhala. We adapt to you, not the other way around.</p></div>
+    <div class="card"><div class="card-icon">❤️</div><h3>Emotion-Aware</h3><p>Advanced SER &amp; TER models detect 6 emotions and deliver personalized support.</p></div>
+  </section>
+</main>
+</body>
+</html>
